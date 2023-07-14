@@ -1,5 +1,5 @@
 /*
- * Normal Jenkinsfile that will build and do Policy and SCA scans
+ *  Jenkinsfile that will build the application, and run Veracode SAST & SCA.
  */
 
 pipeline {
@@ -9,7 +9,7 @@ pipeline {
         VERACODE_APP_NAME = 'VeraDemo'      // App Name in the Veracode Platform
     }
 
-    // this is optional on Linux, if jenkins does not have access to your locally installed docker
+    // This is optional on Linux, if Jenkins does not have access to your locally installed docker
     //tools {
         // these match up with 'Manage Jenkins -> Global Tool Config'
         //'org.jenkinsci.plugins.docker.commons.tools.DockerTool' 'docker-latest' 
@@ -52,7 +52,7 @@ pipeline {
             }
         }
 
-        stage ('Veracode scan') {
+        stage ('Veracode Policy Scan') {
             steps {
                 script {
                     if(isUnix() == true) {
@@ -63,7 +63,7 @@ pipeline {
                     }
                 }
 
-                echo 'Veracode scanning'
+                echo 'Veracode Policy Scan'
                 withCredentials([ usernamePassword ( 
                     credentialsId: 'veracode_login', usernameVariable: 'VERACODE_API_ID', passwordVariable: 'VERACODE_API_KEY') ]) {
                         // fire-and-forget 
@@ -75,9 +75,9 @@ pipeline {
             }
         }
 
-        stage ('Veracode SCA') {
+        stage ('Veracode Software Composition Analysis') {
             steps {
-                echo 'Veracode SCA'
+                echo 'Veracode Software Composition Analysis'
                 withCredentials([ string(credentialsId: 'SCA_Token', variable: 'SRCCLR_API_TOKEN')]) {
                     withMaven(maven:'maven-3') {
                         script {
